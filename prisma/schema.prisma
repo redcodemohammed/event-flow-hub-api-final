@@ -15,35 +15,36 @@ model User {
   name          String?
   email         String?   @unique
   emailVerified DateTime?
-  account       Account[]
+  accounts      Account[]
   sessions      Session[]
+
+  createdAt DateTime @default(now())
 
   @@map("users")
 }
 
-model Account {
-  id                String  @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String  @db.ObjectId
-  provider          String
+type Account {
+  provider          AccountProvider
   providerAccountId String
-  refresh_token     String?
   access_token      String?
   scope             String?
-  expires_at        Int?
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-  @@map("accounts")
+  createdAt DateTime @default(now())
 }
 
 model Session {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   sessionToken String   @unique
   userId       String   @db.ObjectId
-  expires      DateTime
+  deviceName   String?
+  deviceIP     String?
+  createdAt    DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
+}
+
+enum AccountProvider {
+  GOOGLE
 }
